@@ -18,9 +18,10 @@ def load_brazilian_holidays():
     The following URL may help: http://www.anbima.com.br/feriados/feriados.asp
     """
     with open('holidays.csv') as f:
-        reader = csv.reader(f)
+        reader = csv.reader(f, )
+        reader.next()  # skip header
         for line in reader:
-            assert len(line) == 1
+            assert len(line) == 2
             date = time.strptime(''.join(line), '%m/%d/%Y')
             date = datetime.date(date.tm_year, date.tm_mon, date.tm_mday)
             holidays.append(date)
