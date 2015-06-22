@@ -18,7 +18,7 @@ def load_brazilian_holidays():
     The following URL may help: http://www.anbima.com.br/feriados/feriados.asp
     """
     with open('holidays.csv') as f:
-        reader = csv.reader(f, )
+        reader = csv.reader(f)
         reader.next()  # skip header
         for line in reader:
             assert len(line) == 2
