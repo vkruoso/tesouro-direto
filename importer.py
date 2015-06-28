@@ -32,4 +32,3 @@ for row in rows:
 
 from pprint import pprint
 pprint(index)
-
