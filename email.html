@@ -1,0 +1,197 @@
+<h2>Titulos</h2>
+<table class="responsive">
+    <thead>
+    <tr>
+        <th rowspan="2">Titulo</th>
+        <th colspan="5">Quantidade de titulos</th>
+        <th colspan="3">Valores (R$)</th>
+    </tr>
+    <tr>
+        <th>Inicial</th>
+        <th>Creditos</th>
+        <th>Debitos</th>
+        <th>Bloq.</th>
+        <th>Atual</th>
+        <th>Inicial</th>
+        <th>Bruto atual</th>
+        <th>Liquido atual</th>
+    </tr>
+    </thead>
+    <tbody>
+{% for title, data in new.iteritems() %}
+        <tr class="nowrap">
+            <td class="text-left">
+               {{ title }}
+            </td>
+            <td class="text-right">
+               {{ data.initial_titles }}
+            </td>
+            <td class="text-right">
+                {{ data.credit_titles }}
+            </td>
+            <td class="text-right">
+                {{ data.debit_titles }}
+            </td>
+            <td class="text-right">
+                {{ data.bloqued_titles }}
+            </td>
+            <td class="text-right">
+                {{ data.current_titles }}
+            </td>
+            <td class="text-right">
+                {{ data.initial_value }}
+            </td>
+            <td class="text-right">
+                {{ data.gross_value }}
+            </td>
+            <td class="text-right">
+                {{ data.net_value }}
+            </td>
+        </tr>
+{% endfor %}
+    </tbody>
+    </table>
+
+<h2>Analitico</h2>
+
+
+{% for title, data in new.iteritems() %}
+    <h3>{{title}}</h3>
+    <table class="responsive">
+        <thead>
+            <tr>
+                <th rowspan="2">
+                    Data<br />
+                    compra
+                </th>
+                <th rowspan="2">
+                    Saldo<br />
+                    atual
+                </th>
+                <th rowspan="2">
+                    Transacao<br />
+                    origem (R$)
+                </th>
+                <th rowspan="2">
+                    Valor bruto (R$)
+                </th>
+                <th rowspan="2">
+                    PU<br />
+                    compra (R$)
+                </th>
+                <th rowspan="2">
+                    Taxa<br />
+                    pactuada (% a.a)
+                </th>
+                <th rowspan="2">
+                    Dias<br />
+                    corridos compra
+                </th>
+                <th rowspan="2">
+                    Aliquota<br />
+                    I.R (%)
+                </th>
+                <th colspan="2">
+                    Imposto previsto (R$)
+                </th>
+                <th colspan="2">
+                    Taxa devida (R$)
+                </th>
+                <th rowspan="2">
+                    Valor liquido (R$)
+                </th>
+                <th colspan="4">
+                    Rentabilidade bruta (%)
+                </th>
+            </tr>
+            <tr>
+                <!-- rowspan -->
+                <th>
+                    I.R
+                </th>
+                <th>
+                    IOF
+                </th>
+                <th>
+                    BVMF
+                </th>
+                <th>
+                    Agente de<br />
+                    custodia
+                </th>
+                <!-- rowspan -->
+                <th>
+                    Mes
+                </th>
+                <th>
+                    Ano
+                </th>
+                <th>
+                    12 meses
+                </th>
+                <th>
+                    Acumulada
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+{% for date, detail in data.details.iteritems() %}
+    <tr class="nowrap">
+        <td class="text-center">
+            {{ date }}
+        </td>
+        <td class="text-right">
+            {{ detail.current_balance }}
+        </td>
+        <td class="text-right">
+            {{ detail.initial_transaction }}
+        </td>
+        <td class="text-right">
+            {{ detail.gross_value }}
+        </td>
+        <td class="text-right">
+            {{ detail.buy_unit }}
+        </td>
+        <td class="text-right">
+            {{ detail.agreed_rate }}
+        </td>
+        <td class="text-right">
+            {{ detail.days }}
+        </td>
+        <td class="text-right">
+            {{ detail.ir_rate }}
+        </td>
+        <td class="text-right">
+            {{ detail.ir_tax }}
+        </td>
+        <td class="text-right">
+            {{ detail.iof_tax }}
+        </td>
+        <td class="text-right">
+            {{ detail.bvmf_tax }}
+        </td>
+        <td class="text-right">
+            {{ detail.custody_tax }}
+        </td>
+        <td class="text-right">
+            {{ detail.net_value }}
+        </td>
+        <td class="text-right">
+            {{ detail.gross_rate_month }}
+        </td>
+        <td class="text-right">
+            {{ detail.gross_rate_year }}
+        </td>
+        <td class="text-right">
+            {{ detail.gross_rate_last_12_months }}
+        </td>
+        <td class="text-right">
+            {{ detail.gross_rate_total }}
+        </td>
+    </tr>
+{% endfor %}
+    </tbody>
+    </table>
+
+{% endfor %}

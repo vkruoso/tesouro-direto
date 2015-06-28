@@ -1,68 +1,88 @@
 
-import requests
-from lxml import html as lxml_html
+import yaml
+import json
+import smtplib
+import argparse
+
+from jinja2 import Template
+from email.mime.text import MIMEText
+from datetime import date
+
+from client import TDClient
 
 
-class TDClient(object):
+class Email(object):
 
-    URL = 'https://tesourodireto.bmfbovespa.com.br/PortalInvestidor/'
-    USER_AGENT = (
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
-        '(KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36'
-    )
+    def __init__(self, config):
+        self.config = config
 
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers = {
-            'User-Agent': self.USER_AGENT,
-            'Referer': self.URL
-        }
+        with open('email.html', 'r') as f:
+            self.template = f.read()
 
-    def login(self, cpf, password):
-        html = self.session.get(self.URL, verify=False, timeout=10).content
-        info = lxml_html.fromstring(html)
+    def send_diff(self, old, new):
+        template = Template(self.template)
+        text = template.render(new=new, old=old)
 
-        # Build post data
-        post_data = self._build_base_post_data(info)
-        post_data['ctl00$BodyContent$txtLogin'] = cpf
-        post_data['ctl00$BodyContent$txtSenha'] = password
-        post_data['ctl00$BodyContent$btnLogar'] = 'Entrar'
+        # Create message container
+        msg = MIMEText(text, 'html')
+        msg['Subject'] = "Atualizacoes Tesouro Direto"
+        msg['From'] = self.config['from']
+        msg['To'] = self.config['to']
 
-        # Submit login information
-        return self.session.post(self.URL, post_data)
-
-    def get_titles(self):
-        extrato = self.URL + 'extrato.aspx'
-        resp = self.session.get(extrato)
-        print resp.content
-
-    def _build_base_post_data(self, current):
-        """Generic post data builder with common fields in the forms."""
-        post_data = {}
-        fields = [
-            '__VIEWSTATE',
-            '__VIEWSTATEGENERATOR',
-            '__EVENTVALIDATION',
-            '__EVENTTARGET',
-            '__EVENTARGUMENT',
-            ('BodyContent_hdnCamposRequeridos',
-             'ctl00$BodyContent$hdnCamposRequeridos')
-        ]
-        for field in fields:
-            # Get input id and name
-            try:
-                (id_, name_) = field
-            except ValueError:
-                id_ = name_ = field
-
-            # Get value and set in the post data
-            input_ = current.xpath('//input[@id="%s"]' % id_)
-            if input_:
-                value = input_[0].value
-                post_data[name_] = value
-        return post_data
+        # Send the message via SMTP server
+        port = self.config.get('port', 23)
+        s = smtplib.SMTP(self.config['server'], port)
+        s.login(self.config['username'], self.config['password'])
+        s.sendmail(msg['From'], msg['To'], msg.as_string())
+        s.quit()
 
 
-client = TDClient()
-client.login(cpf='00000000000', password='secret')
-client.get_titles()
+class Reporter(object):
+
+    def run_cli(self):
+        # Parse arguments (config file location)
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-c", "--config", default="config.yml",
+                            help="path to configuration file")
+        args = parser.parse_args()
+
+        # Load configuration
+        with open(args.config, 'r') as f:
+            config = yaml.safe_load(f)
+
+        self.report(config)
+
+    def report(self, config):
+        # Get data
+        prev = self._get_current_data()
+        data = self._get_new_data(config['bmfbovespa'])
+
+        # Build email
+        email = Email(config['smtp'])
+        email.send_diff(prev, data)
+
+    def _get_current_data(self):
+        """Returns the current saved data."""
+        return None
+
+    def _get_new_data(self, config):
+        # Build client and login
+        client = TDClient()
+        client.login(cpf=config['cpf'], password=config['password'])
+
+        # Get titles and their details
+        titles = client.get_titles(date.today().month, date.today().year)
+        for name, data in titles.iteritems():
+            data['details'] = client.get_title_details(name, data)
+
+        # Logout and return
+        client.logout()
+        return titles
+
+    def _save_latest(self, titles):
+        with open('data.json', 'w') as f:
+            json.dump(titles, f)
+
+
+if __name__ == '__main__':
+    Reporter().run_cli()
