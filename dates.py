@@ -44,7 +44,7 @@ def brazilian_bank_days(low, high):
     date = low
     delta = datetime.timedelta(days=1)
     while date < high:
-        if date.weekday() not in [5, 6] and not date in holidays:
+        if date.weekday() not in [5, 6] and date not in holidays:
             cnt = cnt + 1
         date = date + delta
     return cnt
