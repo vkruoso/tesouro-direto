@@ -1,14 +1,33 @@
 
-import yaml
+import argparse
 import json
 import smtplib
-import argparse
+import yaml
 
-from jinja2 import Template
-from email.mime.text import MIMEText
 from datetime import date
+from email.mime.text import MIMEText
+from jinja2 import Environment, PackageLoader
 
 from client import TDClient
+
+
+def format(number):
+    return '%.2f' % number
+
+
+def diff(field, new, old):
+    assert field in new
+    new = new[field]
+
+    # Check if old value is valid, or return new value
+    if old is None or field not in old:
+        return format(new)
+    old = old[field]
+
+    # Compare both values to determine some difference
+    if isinstance(new, float) and isinstance(old, float) and new != old:
+        return '%.2f (%s%.2f)' % (new, '+' if new > old else '', new-old)
+    return format(new)
 
 
 class Email(object):
@@ -16,11 +35,12 @@ class Email(object):
     def __init__(self, config):
         self.config = config
 
-        with open('email.html', 'r') as f:
-            self.template = f.read()
-
     def send_diff(self, old, new):
-        template = Template(self.template)
+        environment = Environment(loader=PackageLoader('td', 'templates'))
+        environment.filters['diff'] = diff
+        environment.filters['format'] = format
+        template = environment.get_template('email.html')
+
         text = template.render(new=new, old=old)
 
         # Create message container
@@ -61,9 +81,14 @@ class Reporter(object):
         email = Email(config['smtp'])
         email.send_diff(prev, data)
 
+        # Save new data to disk
+        self._save_data(data)
+
     def _get_current_data(self):
         """Returns the current saved data."""
-        return None
+        with open('data.json', 'r') as f:
+            data = f.read()
+        return json.loads(data)
 
     def _get_new_data(self, config):
         # Build client and login
@@ -79,7 +104,7 @@ class Reporter(object):
         client.logout()
         return titles
 
-    def _save_latest(self, titles):
+    def _save_data(self, titles):
         with open('data.json', 'w') as f:
             json.dump(titles, f)
 

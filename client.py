@@ -44,7 +44,7 @@ class TDClient(object):
         post_data['ctl00$BodyContent$txtSenha'] = password
         post_data['ctl00$BodyContent$btnLogar'] = 'Entrar'
 
-        # Submit login information (TODO: check success)
+        # Submit login information (TODO: check if login succeeded)
         resp = self.session.post(self.URL, post_data)
 
         # Maintain the URL for logout

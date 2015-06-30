@@ -1,3 +1,11 @@
+{% macro print_diff(new, old, field) -%}
+    {{ field|diff(new, old) }}
+{%- endmacro %}
+
+{% macro format(num) -%}
+    {{ num|format }}
+{%- endmacro %}
+
 <h2>Titulos</h2>
 <table class="responsive">
     <thead>
@@ -19,33 +27,34 @@
     </thead>
     <tbody>
 {% for title, data in new.iteritems() %}
+   {% set data_old = old[title] %}
         <tr class="nowrap">
             <td class="text-left">
-               {{ title }}
+                {{ title }}
             </td>
             <td class="text-right">
-               {{ data.initial_titles }}
+                {{ print_diff(data, data_old, 'initial_titles') }}
             </td>
             <td class="text-right">
-                {{ data.credit_titles }}
+                {{ print_diff(data, data_old, 'credit_titles') }}
             </td>
             <td class="text-right">
-                {{ data.debit_titles }}
+                {{ print_diff(data, data_old, 'debit_titles') }}
             </td>
             <td class="text-right">
-                {{ data.bloqued_titles }}
+                {{ print_diff(data, data_old, 'bloqued_titles') }}
             </td>
             <td class="text-right">
-                {{ data.current_titles }}
+                {{ print_diff(data, data_old, 'current_titles') }}
             </td>
             <td class="text-right">
-                {{ data.initial_value }}
+                {{ print_diff(data, data_old, 'initial_value') }}
             </td>
             <td class="text-right">
-                {{ data.gross_value }}
+                {{ print_diff(data, data_old, 'gross_value') }}
             </td>
             <td class="text-right">
-                {{ data.net_value }}
+                {{ print_diff(data, data_old, 'net_value') }}
             </td>
         </tr>
 {% endfor %}
@@ -56,6 +65,7 @@
 
 
 {% for title, data in new.iteritems() %}
+    {% set data_old = old[title] %}
     <h3>{{title}}</h3>
     <table class="responsive">
         <thead>
@@ -136,61 +146,75 @@
         </thead>
         <tbody>
 
-{% for date, detail in data.details.iteritems() %}
+
+    {% for date, detail in data.details.iteritems() %}
+
+        {% if old[title] is defined %}
+            {% if old[title].details is defined %}
+                {% set old_detail = old[title].details[date] %}
+            {% else %}
+                {% set old_detail = undefined %}
+            {% endif %}
+        {% else %}
+            {% set old_detail = undefined %}
+        {% endif %}
+
     <tr class="nowrap">
         <td class="text-center">
             {{ date }}
         </td>
         <td class="text-right">
-            {{ detail.current_balance }}
+            {{ print_diff(detail, old_detail, 'current_balance') }}
         </td>
         <td class="text-right">
-            {{ detail.initial_transaction }}
+            {{ format(detail.initial_transaction) }}
         </td>
         <td class="text-right">
-            {{ detail.gross_value }}
+            {{ format(detail.gross_value) }}
         </td>
         <td class="text-right">
-            {{ detail.buy_unit }}
+            {{ format(detail.buy_unit) }}
         </td>
         <td class="text-right">
-            {{ detail.agreed_rate }}
+            {{ format(detail.agreed_rate) }}
         </td>
         <td class="text-right">
             {{ detail.days }}
         </td>
         <td class="text-right">
-            {{ detail.ir_rate }}
+            {{ format(detail.ir_rate) }}
         </td>
         <td class="text-right">
-            {{ detail.ir_tax }}
+            {{ print_diff(detail, old_detail, 'ir_tax') }}
         </td>
         <td class="text-right">
-            {{ detail.iof_tax }}
+            {{ print_diff(detail, old_detail, 'iof_tax') }}
         </td>
         <td class="text-right">
-            {{ detail.bvmf_tax }}
+            {{ print_diff(detail, old_detail, 'bvmf_tax') }}
         </td>
         <td class="text-right">
-            {{ detail.custody_tax }}
+            {{ print_diff(detail, old_detail, 'custody_tax') }}
         </td>
         <td class="text-right">
-            {{ detail.net_value }}
+            {{ print_diff(detail, old_detail, 'net_value') }}
         </td>
         <td class="text-right">
-            {{ detail.gross_rate_month }}
+            {{ format(detail.gross_rate_month) }}
         </td>
         <td class="text-right">
-            {{ detail.gross_rate_year }}
+            {{ format(detail.gross_rate_year) }}
         </td>
         <td class="text-right">
-            {{ detail.gross_rate_last_12_months }}
+            {{ format(detail.gross_rate_last_12_months) }}
         </td>
         <td class="text-right">
-            {{ detail.gross_rate_total }}
+            {{ print_diff(detail, old_detail, 'gross_rate_total') }}
         </td>
     </tr>
-{% endfor %}
+    {% endfor %}
+
+
     </tbody>
     </table>
 
