@@ -1,0 +1,229 @@
+{% macro print_diff(new, old, field) -%}
+    {{ field|diff(new, old) }}
+{%- endmacro %}
+
+{% macro format(num) -%}
+    {{ num|format }}
+{%- endmacro %}
+
+<h2>Titulos</h2>
+<table class="responsive">
+    <thead>
+    <tr>
+        <th rowspan="2">Titulo</th>
+        <th colspan="5">Quantidade de titulos</th>
+        <th colspan="3">Valores (R$)</th>
+    </tr>
+    <tr>
+        <th>Inicial</th>
+        <th>Creditos</th>
+        <th>Debitos</th>
+        <th>Bloq.</th>
+        <th>Atual</th>
+        <th>Inicial</th>
+        <th>Bruto atual</th>
+        <th>Liquido atual</th>
+    </tr>
+    </thead>
+    <tbody>
+{% for title, data in newt.iteritems() %}
+    {% if oldt is defined %}
+        {% set data_old = oldt[title] %}
+    {% else %}
+        {% set data_old = undefined %}
+    {% endif %}
+        <tr class="nowrap">
+            <td class="text-left">
+                {{ title }}
+            </td>
+            <td class="text-right">
+                {{ print_diff(data, data_old, 'initial_titles') }}
+            </td>
+            <td class="text-right">
+                {{ print_diff(data, data_old, 'credit_titles') }}
+            </td>
+            <td class="text-right">
+                {{ print_diff(data, data_old, 'debit_titles') }}
+            </td>
+            <td class="text-right">
+                {{ print_diff(data, data_old, 'bloqued_titles') }}
+            </td>
+            <td class="text-right">
+                {{ print_diff(data, data_old, 'current_titles') }}
+            </td>
+            <td class="text-right">
+                {{ print_diff(data, data_old, 'initial_value') }}
+            </td>
+            <td class="text-right">
+                {{ print_diff(data, data_old, 'gross_value') }}
+            </td>
+            <td class="text-right">
+                {{ print_diff(data, data_old, 'net_value') }}
+            </td>
+        </tr>
+{% endfor %}
+    </tbody>
+    </table>
+
+<h2>Analitico</h2>
+
+
+{% for title, data in newt.iteritems() %}
+    {% if oldt is defined %}
+        {% set data_old = oldt[title] %}
+    {% else %}
+        {% set data_old = undefined %}
+    {% endif %}
+    <h3>{{title}}</h3>
+    <table class="responsive">
+        <thead>
+            <tr>
+                <th rowspan="2">
+                    Data<br />
+                    compra
+                </th>
+                <th rowspan="2">
+                    Saldo<br />
+                    atual
+                </th>
+                <th rowspan="2">
+                    Transacao<br />
+                    origem (R$)
+                </th>
+                <th rowspan="2">
+                    Valor bruto (R$)
+                </th>
+                <th rowspan="2">
+                    PU<br />
+                    compra (R$)
+                </th>
+                <th rowspan="2">
+                    Taxa<br />
+                    pactuada (% a.a)
+                </th>
+                <th rowspan="2">
+                    Dias<br />
+                    corridos compra
+                </th>
+                <th rowspan="2">
+                    Aliquota<br />
+                    I.R (%)
+                </th>
+                <th colspan="2">
+                    Imposto previsto (R$)
+                </th>
+                <th colspan="2">
+                    Taxa devida (R$)
+                </th>
+                <th rowspan="2">
+                    Valor liquido (R$)
+                </th>
+                <th colspan="4">
+                    Rentabilidade bruta (%)
+                </th>
+            </tr>
+            <tr>
+                <!-- rowspan -->
+                <th>
+                    I.R
+                </th>
+                <th>
+                    IOF
+                </th>
+                <th>
+                    BVMF
+                </th>
+                <th>
+                    Agente de<br />
+                    custodia
+                </th>
+                <!-- rowspan -->
+                <th>
+                    Mes
+                </th>
+                <th>
+                    Ano
+                </th>
+                <th>
+                    12 meses
+                </th>
+                <th>
+                    Acumulada
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+
+    {% for date, detail in data.details.iteritems() %}
+
+        {% if oldt is defined and oldt[title] is defined %}
+            {% if oldt[title].details is defined %}
+                {% set old_detail = oldt[title].details[date] %}
+            {% else %}
+                {% set old_detail = undefined %}
+            {% endif %}
+        {% else %}
+            {% set old_detail = undefined %}
+        {% endif %}
+
+    <tr class="nowrap">
+        <td class="text-center">
+            {{ date }}
+        </td>
+        <td class="text-right">
+            {{ print_diff(detail, old_detail, 'current_balance') }}
+        </td>
+        <td class="text-right">
+            {{ format(detail.initial_transaction) }}
+        </td>
+        <td class="text-right">
+            {{ format(detail.gross_value) }}
+        </td>
+        <td class="text-right">
+            {{ format(detail.buy_unit) }}
+        </td>
+        <td class="text-right">
+            {{ format(detail.agreed_rate) }}
+        </td>
+        <td class="text-right">
+            {{ detail.days }}
+        </td>
+        <td class="text-right">
+            {{ format(detail.ir_rate) }}
+        </td>
+        <td class="text-right">
+            {{ print_diff(detail, old_detail, 'ir_tax') }}
+        </td>
+        <td class="text-right">
+            {{ print_diff(detail, old_detail, 'iof_tax') }}
+        </td>
+        <td class="text-right">
+            {{ print_diff(detail, old_detail, 'bvmf_tax') }}
+        </td>
+        <td class="text-right">
+            {{ print_diff(detail, old_detail, 'custody_tax') }}
+        </td>
+        <td class="text-right">
+            {{ print_diff(detail, old_detail, 'net_value') }}
+        </td>
+        <td class="text-right">
+            {{ format(detail.gross_rate_month) }}
+        </td>
+        <td class="text-right">
+            {{ format(detail.gross_rate_year) }}
+        </td>
+        <td class="text-right">
+            {{ format(detail.gross_rate_last_12_months) }}
+        </td>
+        <td class="text-right">
+            {{ print_diff(detail, old_detail, 'gross_rate_total') }}
+        </td>
+    </tr>
+    {% endfor %}
+
+
+    </tbody>
+    </table>
+
+{% endfor %}

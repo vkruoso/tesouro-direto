@@ -1,6 +1,8 @@
+# coding: utf-8
 
 import argparse
 import json
+import re
 import smtplib
 import yaml
 
@@ -11,8 +13,23 @@ from jinja2 import Environment, PackageLoader
 from client import TDClient
 
 
+images = {
+    '114544':
+        'https://www.rico.com.vc/Util/Image/cabecalho/logo-rico-main.png',
+    '662481':
+        ('https://www.itau.com.br/_arquivosestaticos/Itau/'
+         'defaultTheme/img/logo-itau.png'),
+}
+
+
 def format(number):
     return '%.2f' % number
+
+
+def get_image(brokerage):
+    match = re.match('^(\d+) ', brokerage)
+    if match:
+        return images[match.group(1)]
 
 
 def diff(field, new, old):
@@ -39,13 +56,14 @@ class Email(object):
         environment = Environment(loader=PackageLoader('td', 'templates'))
         environment.filters['diff'] = diff
         environment.filters['format'] = format
+        environment.filters['get_image'] = get_image
         template = environment.get_template('email.html')
 
-        text = template.render(new=new, old=old)
+        text = template.render(new=new, old=old, images=images)
 
         # Create message container
-        msg = MIMEText(text, 'html')
-        msg['Subject'] = "Atualizacoes Tesouro Direto"
+        msg = MIMEText(text, 'html', 'utf-8')
+        msg['Subject'] = "Atualizações Tesouro Direto"
         msg['From'] = self.config['from']
         msg['To'] = self.config['to']
 
@@ -86,9 +104,12 @@ class Reporter(object):
 
     def _get_current_data(self):
         """Returns the current saved data."""
-        with open('data.json', 'r') as f:
-            data = f.read()
-        return json.loads(data)
+        try:
+            with open('data.json', 'r') as f:
+                data = f.read()
+            return json.loads(data)
+        except IOError:
+            return None
 
     def _get_new_data(self, config):
         # Build client and login
@@ -96,13 +117,14 @@ class Reporter(object):
         client.login(cpf=config['cpf'], password=config['password'])
 
         # Get titles and their details
-        titles = client.get_titles(date.today().month, date.today().year)
-        for name, data in titles.iteritems():
-            data['details'] = client.get_title_details(name, data)
+        info = client.get_titles(date.today().month, date.today().year)
+        for brokerage, titles in info.iteritems():
+            for name, data in titles.iteritems():
+                data['details'] = client.get_title_details(name, data)
 
         # Logout and return
         client.logout()
-        return titles
+        return info
 
     def _save_data(self, titles):
         with open('data.json', 'w') as f:

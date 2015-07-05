@@ -1,3 +1,4 @@
+# coding: utf-8
 
 import re
 import requests
@@ -74,25 +75,38 @@ class TDClient(object):
         ]
         keyre = re.compile("\('QS=(.*)'\)")
 
-        # Lets use the fact that the data we are looking for is in a table
-        # line with 10 columns, so we can easily find it.
+        # Find all brokerages available
         index = {}
-        rows = statement.xpath('//tr')
-        for row in rows:
-            tds = row.xpath('td')
-            if len(tds) == 10:
-                values = map(lambda x: clear_text(x.text), tds[1:9])
-                data = dict(zip(columns, values))
+        brokerages = statement.xpath('//p[@class="title doc"]')
+        for brokerage in brokerages:
+            name = brokerage.xpath('a/text()')[0]
 
-                # The first column is the title, that is inside a link
-                title = clear_text(tds[0].xpath('a/text()')[0])
+            # Add an entry to this brokerage in the index
+            data = {}
+            index[name] = data
 
-                # The last column has the key to get more data for the title
-                value = tds[9].xpath('a/@onclick')[0]
-                data['key'] = keyre.search(value).group(1)
+            # The data section that have information about all titles of
+            # a brokerage is just above the paragraph with its title.
+            section = brokerage.getparent()
 
-                # Consolidate the information
-                index[title] = data
+            # Lets use the fact that the data we are looking for is in a
+            # table line with 10 columns, so we can easily find it.
+            rows = section.xpath('.//tr')
+            for row in rows:
+                tds = row.xpath('td')
+                if len(tds) == 10:
+                    values = map(lambda x: clear_text(x.text), tds[1:9])
+                    table = dict(zip(columns, values))
+
+                    # The first column is the title, that is inside a link
+                    title = clear_text(tds[0].xpath('a/text()')[0])
+
+                    # The last column has the key to get data for the title
+                    value = tds[9].xpath('a/@onclick')[0]
+                    table['key'] = keyre.search(value).group(1)
+
+                    # Consolidate the information
+                    data[title] = table
         return index
 
     def get_title_details(self, name, title):
