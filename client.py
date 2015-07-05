@@ -134,6 +134,7 @@ class TDClient(object):
             if len(tds) == 17:
                 values = map(lambda x: clear_text(x.text), tds[1:])
                 data = dict(zip(columns, values))
+                data['days'] = int(data['days'])
 
                 # The first column is the buy date
                 date = clear_text(tds[0].text)
