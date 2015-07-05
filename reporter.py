@@ -31,6 +31,15 @@ def get_image(brokerage):
     if match:
         return images[match.group(1)]
 
+def diff_color(new, old):
+    # TODO: in some fields if the value goes down (lke taxes), we might
+    # want to invert the colors.
+    positive = new > old
+    diff = '%s%.2f' % ('+' if positive else '', new-old)
+    color = 'green' if positive else 'red'
+
+    return '(<span style="color: %s">%s</span>)' % (color, diff)
+
 
 def diff(field, new, old):
     assert field in new
@@ -43,7 +52,7 @@ def diff(field, new, old):
 
     # Compare both values to determine some difference
     if isinstance(new, float) and isinstance(old, float) and new != old:
-        return '%.2f (%s%.2f)' % (new, '+' if new > old else '', new-old)
+        return '%.2f %s' % (new, diff_color(new, old))
     return format(new)
 
 
