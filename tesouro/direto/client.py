@@ -17,6 +17,12 @@ def clear_text(text):
         return text
 
 
+def calculate(title, data):
+    if title.endswith('(LFT)'):
+        return data['net_value'] - data['initial_value']
+    return None
+
+
 class TDClient(object):
 
     URL = 'https://tesourodireto.bmfbovespa.com.br/PortalInvestidor/'
@@ -82,6 +88,7 @@ class TDClient(object):
             name = brokerage.xpath('a/text()')[0]
 
             # Add an entry to this brokerage in the index
+            calcs = {}
             data = {}
             index[name] = data
 
@@ -107,6 +114,11 @@ class TDClient(object):
 
                     # Consolidate the information
                     data[title] = table
+
+                    # Calculate information about the title
+                    calcs[title] = calculate(title, table)
+            from pprint import pprint
+            pprint(calcs)
         return index
 
     def get_title_details(self, name, title):
