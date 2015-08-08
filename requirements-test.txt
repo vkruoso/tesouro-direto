@@ -1,0 +1,4 @@
+requests
+mock
+pytest
+jinja2
