@@ -43,8 +43,8 @@ lists them based on the brokerage and them on the titles you have.
 
 Besides that it will provide the following information:
 
-  * Summaries of all your titles;
-  * Calculations about your title current situation.
+* Summaries of all your titles;
+* Calculations about your title current situation.
 
 Here is a sample email screenshot:
 (todo)
@@ -58,7 +58,7 @@ a automated email at the time and periodicity that you like.
 
 
 Work Days Calculation
-+++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^
 
 There is a simple module that can calculate the amount of work days between
 two dates based on Brazilian national holidays. You can use it in your
