@@ -4,11 +4,6 @@ import pytest
 from tesouro import dates
 
 
-@pytest.fixture
-def cupom_date(request):
-    return request.param
-
-
 class TestDates(object):
 
     @pytest.mark.parametrize("cupom_date,bank_days", [
