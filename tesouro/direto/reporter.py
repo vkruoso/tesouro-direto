@@ -31,6 +31,7 @@ def get_image(brokerage):
     if match:
         return images[match.group(1)]
 
+
 def diff_color(new, old):
     # TODO: in some fields if the value goes down (lke taxes), we might
     # want to invert the colors.
