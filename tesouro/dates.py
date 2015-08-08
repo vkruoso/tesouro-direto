@@ -1,8 +1,9 @@
 """Module to allow financial dates calculations."""
 
 import csv
-import time
 import datetime
+import os
+import time
 
 __all__ = ['brazilian_bank_days']
 
@@ -17,7 +18,8 @@ def load_brazilian_holidays():
     To update this list with newer information, check the Anbima website.
     The following URL may help: http://www.anbima.com.br/feriados/feriados.asp
     """
-    with open('holidays.csv') as f:
+    path = os.path.join(os.path.dirname(__file__), 'holidays.csv')
+    with open(path, 'r') as f:
         reader = csv.reader(f)
         reader.next()  # skip header
         for line in reader:
