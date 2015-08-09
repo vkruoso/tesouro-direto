@@ -10,7 +10,7 @@ from datetime import date
 from email.mime.text import MIMEText
 from jinja2 import Environment, PackageLoader
 
-from client import TDClient
+from tesouro.direto.client import TDClient
 
 
 images = {
@@ -63,7 +63,7 @@ class Email(object):
         self.config = config
 
     def send_diff(self, old, new):
-        environment = Environment(loader=PackageLoader('td', 'templates'))
+        environment = Environment(loader=PackageLoader('tesouro', 'templates'))
         environment.filters['diff'] = diff
         environment.filters['format'] = format
         environment.filters['get_image'] = get_image
