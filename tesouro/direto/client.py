@@ -117,8 +117,6 @@ class TDClient(object):
 
                     # Calculate information about the title
                     calcs[title] = calculate(title, table)
-            from pprint import pprint
-            pprint(calcs)
         return index
 
     def get_title_details(self, name, title):
