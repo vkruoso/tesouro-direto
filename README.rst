@@ -83,7 +83,7 @@ a automated email at the time and periodicity that you like.
 
 
 Work Days Calculation
-^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 There is a simple module that can calculate the amount of work days between
 two dates based on Brazilian national holidays. You can use it in your

@@ -69,9 +69,11 @@ setup(
         'Natural Language :: English',
         'Intended Audience :: Developers',
         'Intended Audience :: End Users/Desktop',
+        'Intended Audience :: Financial and Insurance Industry',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Topic :: Utilities',
-        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Office/Business :: Financial :: Investment',
+        'Topic :: Software Development :: Libraries :: Python Modules'
     ],
 )
