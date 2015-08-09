@@ -27,6 +27,31 @@ To install the tool the easiest way is to use pip::
     pip install tesouro-direto
 
 
+Configuration
+-------------
+
+Here is a sample configuration file:
+
+.. code-block:: YAML
+
+    # The credentials to access the tesourodireto.bmfbovespa.com.br website.
+    # This is necessary to the tool to get your information and send it to you.
+    bmfbovespa:
+        cpf: "00000000000"
+        password: "secret"
+
+    # SMTP settings for email sending. If port is not specified, the default
+    # value is 25. Provide the username and password if necessary.
+    smtp:
+        server: "mail.mydomain.com"
+        port: 587
+        username: "user"
+        password: "secret"
+
+        from: "me@mydomain.com"
+        to: "you@yourdomain.com"
+
+
 Available tools
 ---------------
 
