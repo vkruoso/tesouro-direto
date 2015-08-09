@@ -58,3 +58,6 @@ target/
 
 # config file
 config.yml
+
+# data file
+data.json
