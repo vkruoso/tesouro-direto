@@ -19,10 +19,13 @@ images = {
     '662481':
         ('https://www.itau.com.br/_arquivosestaticos/Itau/'
          'defaultTheme/img/logo-itau.png'),
+    '273538': 'https://www.easynvest.com.br/Pictures/Menu/logo-menu-desktop@2x.png'
 }
 
 
 def format(number):
+    if isinstance(number, basestring):
+        number = float(re.findall("\d+\.\d+", number.replace(',', '.'))[0])
     return '%.2f' % number
 
 

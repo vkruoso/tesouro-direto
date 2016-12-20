@@ -51,8 +51,10 @@ class TDClient(object):
         post_data['ctl00$BodyContent$txtSenha'] = password
         post_data['ctl00$BodyContent$btnLogar'] = 'Entrar'
 
-        # Submit login information (TODO: check if login succeeded)
+        # Submit login information
         resp = self.session.post(self.URL, post_data)
+        if 'Usuario/Senha Invalido(a)!' in resp.content:
+            raise AssertionError('Usuario/Senha Invalido(a)!')
 
         # Maintain the URL for logout
         self._logout_url = lxml_html.fromstring(resp.content).xpath(
@@ -75,9 +77,9 @@ class TDClient(object):
 
         # The columns of the statement page
         columns = [
-            'initial_titles', 'credit_titles', 'debit_titles',
-            'bloqued_titles', 'current_titles',
-            'initial_value', 'gross_value', 'net_value'
+            'due_date', 'invested_value',
+            'current_gross_value', 'current_net_value',
+            'total_titles', 'bloqued_titles'
         ]
         keyre = re.compile("\('QS=(.*)'\)")
 
@@ -88,7 +90,6 @@ class TDClient(object):
             name = brokerage.xpath('a/text()')[0]
 
             # Add an entry to this brokerage in the index
-            calcs = {}
             data = {}
             index[name] = data
 
@@ -97,26 +98,24 @@ class TDClient(object):
             section = brokerage.getparent()
 
             # Lets use the fact that the data we are looking for is in a
-            # table line with 10 columns, so we can easily find it.
+            # table line with 8 columns, so we can easily find it.
             rows = section.xpath('.//tr')
             for row in rows:
                 tds = row.xpath('td')
-                if len(tds) == 10:
-                    values = map(lambda x: clear_text(x.text), tds[1:9])
+                if len(tds) == 8:
+                    values = map(lambda x: clear_text(x.text_content()), tds[1:7])
                     table = dict(zip(columns, values))
+                    print values
 
                     # The first column is the title, that is inside a link
                     title = clear_text(tds[0].xpath('a/text()')[0])
 
                     # The last column has the key to get data for the title
-                    value = tds[9].xpath('a/@onclick')[0]
+                    value = tds[-1].xpath('a/@onclick')[0]
                     table['key'] = keyre.search(value).group(1)
 
                     # Consolidate the information
                     data[title] = table
-
-                    # Calculate information about the title
-                    calcs[title] = calculate(title, table)
         return index
 
     def get_title_details(self, name, title):
@@ -128,11 +127,10 @@ class TDClient(object):
 
         # The columns of the details page
         columns = [
-            'current_balance', 'initial_transaction', 'gross_value',
-            'buy_unit', 'agreed_rate', 'days', 'ir_rate', 'ir_tax', 'iof_tax',
-            'bvmf_tax', 'custody_tax', 'net_value',
-            'gross_rate_month', 'gross_rate_year',
-            'gross_rate_last_12_months', 'gross_rate_total'
+            'total_titles', 'buy_unit', 'invested_value',
+            'agreed_rate', 'current_anual_rate', 'graph', 'current_rate',
+            'gross_value', 'ir_rate', 'ir_tax', 'iof_tax',
+            'bvmf_tax', 'custody_tax', 'net_value'
         ]
 
         # Lets use the fact that the data we are looking for is in a table
@@ -141,10 +139,9 @@ class TDClient(object):
         rows = details.xpath('//tr[@class="nowrap"]')
         for row in rows:
             tds = row.xpath('td')
-            if len(tds) == 17:
+            if len(tds) == 15:
                 values = map(lambda x: clear_text(x.text), tds[1:])
                 data = dict(zip(columns, values))
-                data['days'] = int(data['days'])
 
                 # The first column is the buy date
                 date = clear_text(tds[0].text)
