@@ -14,12 +14,23 @@ from tesouro.direto.client import TDClient
 
 
 images = {
-    '114544':
-        'https://www.rico.com.vc/Util/Image/cabecalho/logo-rico-main.png',
-    '662481':
-        ('https://www.itau.com.br/_arquivosestaticos/Itau/'
-         'defaultTheme/img/logo-itau.png'),
-    '273538': 'https://www.easynvest.com.br/Pictures/Menu/logo-menu-desktop@2x.png'
+    'rico': {
+        'url': (
+            'https://www.rico.com.vc/Util/Image/cabecalho/logo-rico-main.png'
+        )
+    },
+    u'itaú': {
+        'url': (
+            'https://www.itau.com.br/'
+            '_arquivosestaticos/Itau/defaultTheme/img/logo-itau.png'
+        )
+    },
+    'easy': {
+        'url': (
+            'https://www.easynvest.com.br/'
+            'Pictures/Menu/logo-menu-desktop@2x.png'
+        )
+    }
 }
 
 
@@ -30,9 +41,9 @@ def format(number):
 
 
 def get_image(brokerage):
-    match = re.match('^(\d+) ', brokerage)
-    if match:
-        return images[match.group(1)]
+    for name, image in images.iteritems():
+        if name in brokerage.lower():
+            return image['url']
 
 
 def diff_color(new, old):
@@ -95,17 +106,19 @@ class Reporter(object):
         parser = argparse.ArgumentParser()
         parser.add_argument("-c", "--config", default="config.yml",
                             help="path to configuration file")
+        parser.add_argument("-d", "--data-file", default="data.json",
+                            help="the data file")
         args = parser.parse_args()
 
         # Load configuration
         with open(args.config, 'r') as f:
             config = yaml.safe_load(f)
 
-        self.report(config)
+        self.report(config, args.data)
 
-    def report(self, config):
+    def report(self, config, datafile):
         # Get data
-        prev = self._get_current_data()
+        prev = self._get_current_data(datafile)
         data = self._get_new_data(config['bmfbovespa'])
 
         # Build email
@@ -113,12 +126,12 @@ class Reporter(object):
         email.send_diff(prev, data)
 
         # Save new data to disk
-        self._save_data(data)
+        self._save_data(data, datafile)
 
-    def _get_current_data(self):
+    def _get_current_data(self, datafile):
         """Returns the current saved data."""
         try:
-            with open('data.json', 'r') as f:
+            with open(datafile, 'r') as f:
                 data = f.read()
             return json.loads(data)
         except IOError:
@@ -139,8 +152,8 @@ class Reporter(object):
         client.logout()
         return info
 
-    def _save_data(self, titles):
-        with open('data.json', 'w') as f:
+    def _save_data(self, titles, datafile):
+        with open(datafile, 'w') as f:
             json.dump(titles, f)
 
 
