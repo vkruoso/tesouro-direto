@@ -169,11 +169,11 @@
       <tbody>
 
 
-    {% for date, detail in data.details.iteritems() %}
+    {% for detail in data.details %}
 
         {% if oldt is defined and oldt[title] is defined %}
-            {% if oldt[title].details is defined %}
-                {% set old_detail = oldt[title].details[date] %}
+            {% if oldt[title].details is defined and len(oldt[title].details) <= loop.index %}
+                {% set old_detail = oldt[title].details[loop.index-1] %}
             {% else %}
                 {% set old_detail = undefined %}
             {% endif %}
@@ -183,7 +183,7 @@
 
     <tr class="nowrap">
         <td>
-            {{ date }}
+            {{ detail['date'] }}
         </td>
         <td align="right">
             {{ format(detail.total_titles) }}

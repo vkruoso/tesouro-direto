@@ -2,6 +2,7 @@
 
 import re
 import requests
+from datetime import datetime
 from lxml import html as lxml_html
 
 
@@ -127,7 +128,7 @@ class TDClient(object):
 
         # The columns of the details page
         columns = [
-            'total_titles', 'buy_unit', 'invested_value',
+            'date', 'total_titles', 'buy_unit', 'invested_value',
             'agreed_rate', 'current_anual_rate', 'graph', 'current_rate',
             'gross_value', 'days', 'ir_rate', 'ir_tax', 'iof_tax',
             'bvmf_tax', 'custody_tax', 'net_value'
@@ -135,20 +136,31 @@ class TDClient(object):
 
         # Lets use the fact that the data we are looking for is in a table
         # line with 17 columns and class 'nowrap', so we can easily find it.
-        index = {}
+        index = []
         rows = details.xpath('//tr[@class="nowrap"]')
         for row in rows:
             tds = row.xpath('td')
             if len(tds) == 16:
-                values = map(lambda x: clear_text(x.text), tds[1:])
+                values = map(lambda x: clear_text(x.text), tds)
                 data = dict(zip(columns, values))
 
-                # The first column is the buy date
-                date = clear_text(tds[0].text)
-
                 # Consolidate the information
-                index[date] = data
+                index.append(data)
+
+        index.sort(cmp=self._date_cmp, key=self._date_key)
         return index
+
+    def _date_key(self, value):
+        return value['date']
+
+    def _date_cmp(self, a, b):
+        date_a = datetime.strptime(a, '%d/%m/%Y')
+        date_b = datetime.strptime(b, '%d/%m/%Y')
+        if date_a == date_b:
+            return 0
+        if date_a < date_b:
+            return -1
+        return 1
 
     def logout(self):
         if self._logout_url:
