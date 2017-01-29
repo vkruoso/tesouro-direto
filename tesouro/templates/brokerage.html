@@ -73,7 +73,7 @@
             <th colspan="5">
                 Dados do seu investimento
             </th>
-            <th colspan="10">
+            <th colspan="11">
                 Situação hoje (no caso de venda antecipada)
             </th>
         </tr>
@@ -109,6 +109,10 @@
                 C
             </th>
             <th>
+                Tempo da<br>
+                aplicação
+            </th>
+            <th>
                 Alíquota I.R.
             </th>
             <th colspan="2" style="padding: 5px;">
@@ -135,6 +139,9 @@
             </th>
             <th>
                 (R$)
+            </th>
+            <th>
+                Dias Corridos
             </th>
             <th>
                 (%)
@@ -198,6 +205,9 @@
         </td>
         <td align="right">
             {{ print_diff(detail, old_detail, 'gross_value') }}
+        </td>
+        <td align="right">
+            {{ detail['days'] }}
         </td>
         <td align="right">
             {{ print_diff(detail, old_detail, 'ir_rate') }}

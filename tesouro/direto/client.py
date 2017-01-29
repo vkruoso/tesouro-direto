@@ -129,7 +129,7 @@ class TDClient(object):
         columns = [
             'total_titles', 'buy_unit', 'invested_value',
             'agreed_rate', 'current_anual_rate', 'graph', 'current_rate',
-            'gross_value', 'ir_rate', 'ir_tax', 'iof_tax',
+            'gross_value', 'days', 'ir_rate', 'ir_tax', 'iof_tax',
             'bvmf_tax', 'custody_tax', 'net_value'
         ]
 
@@ -139,7 +139,7 @@ class TDClient(object):
         rows = details.xpath('//tr[@class="nowrap"]')
         for row in rows:
             tds = row.xpath('td')
-            if len(tds) == 15:
+            if len(tds) == 16:
                 values = map(lambda x: clear_text(x.text), tds[1:])
                 data = dict(zip(columns, values))
 

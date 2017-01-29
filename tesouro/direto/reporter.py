@@ -114,7 +114,7 @@ class Reporter(object):
         with open(args.config, 'r') as f:
             config = yaml.safe_load(f)
 
-        self.report(config, args.data)
+        self.report(config, args.data_file)
 
     def report(self, config, datafile):
         # Get data
