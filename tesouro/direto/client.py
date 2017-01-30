@@ -106,7 +106,6 @@ class TDClient(object):
                 if len(tds) == 8:
                     values = map(lambda x: clear_text(x.text_content()), tds[1:7])
                     table = dict(zip(columns, values))
-                    print values
 
                     # The first column is the title, that is inside a link
                     title = clear_text(tds[0].xpath('a/text()')[0])

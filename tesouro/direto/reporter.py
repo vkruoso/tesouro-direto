@@ -56,6 +56,14 @@ def diff_color(new, old):
     return '(<span style="color: %s">%s</span>)' % (color, diff)
 
 
+def get_old_detail(oldt, title, new):
+    if title in oldt and 'details' in oldt[title]:
+        for order in oldt[title]['details']:
+            if new['date'] == order['date']:
+                return order
+    return None
+
+
 def diff(field, new, old):
     assert field in new
     new = new[field]
@@ -81,6 +89,7 @@ class Email(object):
         environment.filters['diff'] = diff
         environment.filters['format'] = format
         environment.filters['get_image'] = get_image
+        environment.filters['get_old_detail'] = get_old_detail
         template = environment.get_template('email.html')
 
         text = template.render(new=new, old=old, images=images)

@@ -61,11 +61,6 @@
 
 
 {% for title, data in newt.iteritems() %}
-    {% if oldt is defined %}
-        {% set data_old = oldt[title] %}
-    {% else %}
-        {% set data_old = undefined %}
-    {% endif %}
     <h3>{{title}}</h3>
     <table class="responsive">
       <thead>
@@ -170,16 +165,7 @@
 
 
     {% for detail in data.details %}
-
-        {% if oldt is defined and oldt[title] is defined %}
-            {% if oldt[title].details is defined and len(oldt[title].details) <= loop.index %}
-                {% set old_detail = oldt[title].details[loop.index-1] %}
-            {% else %}
-                {% set old_detail = undefined %}
-            {% endif %}
-        {% else %}
-            {% set old_detail = undefined %}
-        {% endif %}
+        {% set old_detail = oldt|get_old_detail(title, detail) %}
 
     <tr class="nowrap">
         <td>
