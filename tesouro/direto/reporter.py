@@ -14,23 +14,13 @@ from tesouro.direto.client import TDClient
 
 
 images = {
-    'rico': {
-        'url': (
-            'https://www.rico.com.vc/Util/Image/cabecalho/logo-rico-main.png'
-        )
-    },
-    u'itaú': {
-        'url': (
-            'https://www.itau.com.br/'
-            '_arquivosestaticos/Itau/defaultTheme/img/logo-itau.png'
-        )
-    },
-    'easy': {
-        'url': (
-            'https://www.easynvest.com.br/'
-            'Pictures/Menu/logo-menu-desktop@2x.png'
-        )
-    }
+    u'brasil plural': 'http://www.brasilplural.com/Site/Content/Img/logo.png',
+    u'clear': 'https://www.clear.com.br/site/Content/styles/img/im_lg_h.png',
+    u'cm capital': 'http://bancodata.com.br/assets/img/logos/cm-capital-markets_m.jpg',  # noqa: E501
+    u'easy': 'https://www.easynvest.com.br/Pictures/Menu/logo-menu-desktop@2x.png',  # noqa: E501
+    u'itaú': 'https://www.itau.com.br/_arquivosestaticos/Itau/defaultTheme/img/logo-itau.png',  # noqa: E501
+    u'modal': 'http://bancodata.com.br/assets/img/logos/bco-modal-sa_m.jpg',
+    u'rico': 'https://www.rico.com.vc/Util/Image/cabecalho/logo-rico-main.png',
 }
 
 
@@ -43,7 +33,7 @@ def format(number):
 def get_image(brokerage):
     for name, image in images.iteritems():
         if name in brokerage.lower():
-            return image['url']
+            return image
 
 
 def diff_color(new, old, invert=False):
