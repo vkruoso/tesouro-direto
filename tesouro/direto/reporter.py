@@ -59,7 +59,10 @@ def diff_color(new, old):
 def get_old_detail(oldt, title, new):
     if title in oldt and 'details' in oldt[title]:
         for order in oldt[title]['details']:
-            if new['date'] == order['date']:
+            if (new['date'] == order['date'] and
+                    new['total_titles'] == order['total_titles'] and
+                    new['buy_unit'] == order['buy_unit']):
+                # this uniquely identify a title
                 return order
     return None
 
