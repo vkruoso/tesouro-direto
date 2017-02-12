@@ -46,13 +46,14 @@ def get_image(brokerage):
             return image['url']
 
 
-def diff_color(new, old):
-    # TODO: in some fields if the value goes down (lke taxes), we might
-    # want to invert the colors.
+def diff_color(new, old, invert=False):
+    colors = {
+        True: 'green',
+        False: 'red',
+    }
     positive = new > old
     diff = '%s%.2f' % ('+' if positive else '', new-old)
-    color = 'green' if positive else 'red'
-
+    color = colors[positive ^ invert]
     return '(<span style="color: %s">%s</span>)' % (color, diff)
 
 
@@ -67,7 +68,7 @@ def get_old_detail(oldt, title, new):
     return None
 
 
-def diff(field, new, old):
+def diff(field, new, old, invert=False):
     assert field in new
     new = new[field]
 
@@ -78,7 +79,7 @@ def diff(field, new, old):
 
     # Compare both values to determine some difference
     if isinstance(new, float) and isinstance(old, float) and new != old:
-        return '%.2f %s' % (new, diff_color(new, old))
+        return '%.2f %s' % (new, diff_color(new, old, invert))
     return format(new)
 
 

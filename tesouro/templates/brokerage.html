@@ -1,5 +1,5 @@
-{% macro print_diff(new, old, field) -%}
-    {{ field|diff(new, old) }}
+{% macro print_diff(new, old, field, invert=False) -%}
+    {{ field|diff(new, old, invert) }}
 {%- endmacro %}
 
 {% macro format(num) -%}
@@ -196,19 +196,19 @@
             {{ detail['days'] }}
         </td>
         <td align="right">
-            {{ print_diff(detail, old_detail, 'ir_rate') }}
+            {{ print_diff(detail, old_detail, 'ir_rate', True) }}
         </td>
         <td align="right">
-            {{ print_diff(detail, old_detail, 'ir_tax') }}
+            {{ print_diff(detail, old_detail, 'ir_tax', True) }}
         </td>
         <td align="right">
-            {{ print_diff(detail, old_detail, 'iof_tax') }}
+            {{ print_diff(detail, old_detail, 'iof_tax', True) }}
         </td>
         <td align="right">
-            {{ print_diff(detail, old_detail, 'bvmf_tax') }}
+            {{ print_diff(detail, old_detail, 'bvmf_tax', True) }}
         </td>
         <td align="right">
-            {{ print_diff(detail, old_detail, 'custody_tax') }}
+            {{ print_diff(detail, old_detail, 'custody_tax', True) }}
         </td>
         <td align="right">
             {{ print_diff(detail, old_detail, 'net_value') }}
