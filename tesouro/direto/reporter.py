@@ -97,6 +97,8 @@ class Email(object):
         # Send the message via SMTP server
         port = self.config.get('port', 23)
         s = smtplib.SMTP(self.config['server'], port)
+        s.ehlo()
+        s.starttls()
         s.login(self.config['username'], self.config['password'])
         s.sendmail(msg['From'], msg['To'], msg.as_string())
         s.quit()
